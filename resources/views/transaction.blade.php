@@ -55,9 +55,11 @@
                   @if(auth()->user()->role != "gudang")
                   <div class="btn-group">
                     @if(auth()->user()->role == "admin")
-                    <a class="btn btn-sm btn-primary btnkonfirmasi" href="#" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasi">Konfirmasi</a>
+                    @if($transaction->image)
+                    <a class="btn btn-sm btn-primary btnkonfirmasi" href="#" data-image="{{$transaction->image}}" data-bank="{{$transaction->bank}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasi">Konfirmasi</a>
+                    @endif
                     @else
-                    <a class="btn btn-sm btn-primary btnkonfirmasicust" href="#" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasicust">Konfirmasi</a>
+                    <a class="btn btn-sm btn-primary btnkonfirmasicust" href="#" data-image="{{$transaction->image}}" data-bank="{{$transaction->bank}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasicust">Konfirmasi</a>
                     @endif  
                   </div>
                   @endif
@@ -240,19 +242,20 @@
         <form class="form-label-left input_mask">
 
           <div class="col-md-12 col-sm-12  form-group has-feedback">
+              <p id="bankp"> </p>
               <label>Foto bukti pembayaran</label>
               </br>
               <img class="mt-3" id="imagekonfirmasi" src="" width=200 alt="Belum tersedia">
           </div>
         </form> 
-      <h5 class="mt-4">Instruksi Pembayaran</h5>
+      {{-- <h5 class="mt-4">Instruksi Pembayaran</h5>
       <ol>
           <li>Di halaman metode pembayaran pilih Transfer Bank</li>
           <li>Pilih Bank tujuan pembayaran (BCA, BNI, BRI, Bank Mandiri, Bank Permata, Bank Sampoerna atau Bank Lainnya)</li>
           <li>Catat nomor rekening (kode Virtual Account) & nominal pembayaran</li>
           <li>Silahkan lakukan pembayaran melalui menu Virtual Account pada M-Banking/ ATM / Internet Banking dan ikuti instruksi pembayaran sesuai Bank yang Anda pilih</li>
           <li>Simpan bukti pembayaran</li>
-      </ol>
+      </ol> --}}
       </div>
       <div class="modal-footer">
       
@@ -280,8 +283,19 @@
               <label>Foto bukti pembayaran</label>
                 <input type="file" name="image" class="form-control">
               <img class="mt-3" id="imagekonfirmasicust" src="" width=200>
+              <select name="bank" id="bankselect" class="form-control mt-3">
+                <option value="bca">BCA</option>
+                <option value="panin">PANIN</option>
+              </select>
           </div>
+          <h5 class="mt-4">Informasi Pembayaran</h5>
+          Pembayaran dapat dilakukan melalui rekening
+          <ul class="bankul">
+              <li>Bank BCA - No Rekening : 109210912 - a.n. PT PRIMA SAMBARA PERSADA</li>
+              <li>Bank PANIN - No Rekening : 109210912 - a.n. PT PRIMA SAMBARA PERSADA</li>
+          </ul>
           <h5 class="mt-4">Instruksi Pembayaran</h5>
+          
           <ol>
             <li>Di halaman metode pembayaran pilih Transfer Bank</li>
             <li>Pilih Bank tujuan pembayaran (BCA, BNI, BRI, Bank Mandiri, Bank Permata, Bank Sampoerna atau Bank Lainnya)</li>
@@ -309,7 +323,6 @@
       dataType: "JSON",
       success: function (r) {
         $('.tableview').empty();
-        console.log(r,r.detail_transaction[0]);
         let grandtotal =0
         for(let index = 0;index<r.detail_transaction.length;index++){
           grandtotal = grandtotal + r.detail_transaction[index].price * r.detail_transaction[index].qty;
@@ -328,7 +341,6 @@
             let id = $(this).data('id')
             let image = $(this).data('image')
             let auth = $(this).data('auth')
-            console.log(image.length)
             $('#idStatus').val(id)
             $('#forstatus').attr('action',"{{url('transaction/')}}/"+id)
             $("#statusoption .paidoption").remove()
@@ -341,9 +353,13 @@
       $('#imagekonfirmasicust').removeAttr('src')
       let id = $(this).data('id')
       let image = $(this).data('image')
-
-      console.log(id)
+      let bank = $(this).data('bank')
+console.log(bank)
       $('#idStatus').val(id)
+      // $(`#bankselect option[value=${bank}]`).change();
+      $(`#bankselect`).val(bank).change();
+
+
       if(image)
         $('#imagekonfirmasicust').attr('src',"{{url('storage')}}/"+image)
 
@@ -353,9 +369,14 @@
       $('#imagekonfirmasi').removeAttr('src')
       let id = $(this).data('id')
       let image = $(this).data('image')
+      let bank = $(this).data('bank')
 
-      console.log(id)
       $('#idStatus').val(id)
+      $('#bankp').html("Pilihan Bank: "+bank.toUpperCase())
+      // $(".bankul").empty()
+      // if(bank.length > 0){
+      //   $('#bankselect').attr('disabled','disa')
+      // }
       if(image)
         $('#imagekonfirmasi').attr('src',"{{url('storage')}}/"+image)
   })

@@ -88,13 +88,14 @@ class TransactionController extends Controller
     public function update(Request $request, string $id)
     {
         // dd($request->all());
+        $data = $request->all();
         $transaction = Transaction::find($id);
         if ($request->type == "image") {
             $data['image'] = $request->file('image')->store(
                 'image/buktibayar',
                 'public'
             );
-            $transaction->update(['image' => $data['image']]);
+            $transaction->update(['image' => $data['image'], 'bank' => $data['bank']]);
         } else {
             $transaction->update(['status' => $request->status]);
         }
