@@ -105,10 +105,10 @@
               <!-- accepted payments column -->
               <div class="col-md-6">
                 <p class="lead">Metode Pembayaran:</p>
-                <img src="images/visa.png" alt="Visa">
-                <img src="images/mastercard.png" alt="Mastercard">
-                <img src="images/american-express.png" alt="American Express">
-                <img src="images/paypal.png" alt="Paypal">
+                <img src="{{asset('images/bca-logo.png')}}" alt="BCA" width=100>
+                <!--<img src="images/mastercard.png" alt="Mastercard">-->
+                <!--<img src="images/american-express.png" alt="American Express">-->
+                <!--<img src="images/paypal.png" alt="Paypal">-->
                 <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
                   Invoice dilampirkan dengan fakturpajak, PO dan Surat Jalan, Harap menandatangani tanda terima kami, Terimakasih.
                 </p>
@@ -124,12 +124,8 @@
                         <td>{{General::rp($total)}}</td>
                       </tr>
                       <tr>
-                        <th>Tax (11%)</th>
-                        <td>{{General::rp($total*0.11)}}</td>
-                      </tr>
-                      <tr>
                         <th>Total:</th>
-                        <td>{{General::rp($total*1.11)}}</td>
+                        <td>{{General::rp($total)}}</td>
                       </tr>
                     </tbody>
                   </table>

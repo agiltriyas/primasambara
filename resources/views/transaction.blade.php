@@ -41,15 +41,15 @@
                 <td>{{$transaction->namapenerima}}</td>
                 <td>{{$transaction->status}}</td>
                 <td>
-                  @if(auth()->user()->role != 'gudang')
+                  
                   <div class="btn-group">
                     <a class="btn btn-sm btn-info btnView" data-id="{{$transaction->id}}" href="#" data-toggle="modal" data-target="#modalView">View</a>
                   </div>
-                  @endif
+                  
                   @if(auth()->user()->role == 'gudang' || auth()->user()->role == 'admin')
 
                   <div class="btn-group">
-                    <a class="btn btn-sm btn-primary btnStatus" data-id="{{$transaction->id}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
+                    <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
                   </div>
                   @endif
                   @if(auth()->user()->role != "gudang")
@@ -62,7 +62,6 @@
                   </div>
                   @endif
                   <!-- Split button -->
-                  @if(auth()->user()->role == 'gudang' || auth()->user()->role == 'admin')
                   <div class="btn-group">
                     <button type="button" class="btn btn-sm btn-danger">Cetak</button>
                     <button type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -73,12 +72,12 @@
                         <a class="dropdown-item" href="{{route('sj',$transaction->id)}}">SURAT JALAN</a>
                       @endif
                       
-                      @if($transaction->status == "INV" && auth()->user()->role == 'admin')
+                    @if($transaction->status == "INV")
+                      @if(auth()->user()->role == 'admin' || auth()->user()->role == 'customer')
                         <a class="dropdown-item" href="{{route('inv',$transaction->id)}}">INVOICE</a>
                       @endif
-
-                    </div>
                     @endif
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -205,13 +204,12 @@
           @method('PUT')
           <input type="hidden" name="id" id="idStatus">
           <div class="col-md-12 col-sm-12  form-group has-feedback">
-            <select class="form-control" name="status" id="">
+            <select class="form-control" name="status" id="statusoption">
               <option value="">--Pilih Status--</option>
               @if(auth()->user()->role == "admin")
               <option value="APPROVE">APPROVE</option>
               <option value="REJECT">REJECT</option>
               <option value="INV">INV</option>
-              <option value="PAID">PAID</option>
               @endif
               <option value="WIP">WIP</option>
               <option value="SJ">SJ</option>
@@ -244,7 +242,7 @@
           <div class="col-md-12 col-sm-12  form-group has-feedback">
               <label>Foto bukti pembayaran</label>
               </br>
-              <img src="images/media.jpg" width=200>
+              <img class="mt-3" id="imagekonfirmasi" src="" width=200 alt="Belum tersedia">
           </div>
         </form> 
       <h5 class="mt-4">Instruksi Pembayaran</h5>
@@ -257,12 +255,6 @@
       </ol>
       </div>
       <div class="modal-footer">
-        <button  data-dismiss="modal" class="btn btn-primary source" onclick="new PNotify({
-          title: 'Berhasil',
-          text: 'Transaksi berhasil diupdate',
-          type: 'success',
-          styling: 'bootstrap3'
-      });">Status Paid</button>
       
       </div>
     </div>
@@ -334,11 +326,18 @@
 
   $('.btnStatus').on('click', function (event) {
             let id = $(this).data('id')
+            let image = $(this).data('image')
             console.log(id)
             $('#idStatus').val(id)
             $('#forstatus').attr('action',"{{url('transaction/')}}/"+id)
+            
+            if(image){
+                 $("#statusoption option:last").remove()
+                $("#statusoption").append('<option value="PAID">PAID</option>')
+            }
         })
   $('.btnkonfirmasicust').on('click', function (event) {
+      $('#imagekonfirmasicust').removeAttr('src')
       let id = $(this).data('id')
       let image = $(this).data('image')
 
@@ -348,6 +347,16 @@
         $('#imagekonfirmasicust').attr('src',"{{url('storage')}}/"+image)
 
       $('#formkonfirmasicust').attr('action',"{{url('transaction/')}}/"+id)
+  })
+  $('.btnkonfirmasi').on('click', function (event) {
+      $('#imagekonfirmasi').removeAttr('src')
+      let id = $(this).data('id')
+      let image = $(this).data('image')
+
+      console.log(id)
+      $('#idStatus').val(id)
+      if(image)
+        $('#imagekonfirmasi').attr('src',"{{url('storage')}}/"+image)
   })
 </script>
 @endpush

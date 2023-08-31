@@ -20,6 +20,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [App\Http\Controllers\HomeController::class, 'welcome'])->name('welcom');
 Auth::routes();
 
+Route::get('/symlink', function(){
+    $target = $_SERVER['DOCUMENT_ROOT']."/public_html/primasambara/storage/app/public";
+    $link = $_SERVER['DOCUMENT_ROOT']."/public_html/primasambara/public/storage";
+    if(symlink( $target, $link )){
+        echo "OK.";
+    } else {
+        echo "Gagal.";
+    }
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::resource('product', App\Http\Controllers\ProductController::class);
