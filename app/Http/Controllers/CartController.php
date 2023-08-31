@@ -73,7 +73,11 @@ class CartController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $cart = Cart::find($id);
+        $cart->update(['qty' => $request->qty]);
+
+        toast('Keranjang berhasil diupdate', 'success');
+        return redirect()->back();
     }
 
     /**
@@ -81,6 +85,10 @@ class CartController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $cart = Cart::find($id);
+        $cart->delete();
+
+        toast('Keranjang berhasil diupdate', 'success');
+        return redirect()->back();
     }
 }

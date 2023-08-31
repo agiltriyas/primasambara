@@ -30,6 +30,7 @@
                 <th>Qty</th>
                 <th>Harga</th>
                 <th>Total</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -42,6 +43,16 @@
                 <td>{{$cart->qty}}</td>
                 <td>{{General::rp($cart->product->price)}}</td>
                 <td>{{General::rp($cart->qty * $cart->product->price)}}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary modalButtonCart" data-id="{{$cart->id}}" data-toggle="modal" data-target="#modalCart">Edit</button>
+                  <a href="" class="btn btn-sm btn-danger" onclick="event.preventDefault();
+                  document.getElementById('delete-cart').submit();">Delete</a>
+                  <form method="post" id="delete-cart" action="{{route('cart.destroy',$cart->id)}}" hidden>
+                    @csrf
+                    @method('delete')
+                    <input type="hidden" name="id" value="{{$cart->id}}">
+                  </form>
+                </td>
               </tr>
               <?php $total = $total + ($cart->qty * $cart->product->price) ?>
               @empty
@@ -88,7 +99,11 @@
           </div>
 
           <div class="col-md-6 col-sm-6  form-group has-feedback">
-            <input type="text" class="form-control has-feedback-left" name="ekspedisi" id="inputSuccess4" placeholder="Jasa Pengiriman">
+            <select name="ekspedisi" id="ekspedisi" class="form-control has-feedback-left">
+              <option value="0">--Pilih Jasa Ekspedisi--</option>
+              <option value="Kargao Dakota">Kargo Dakota</option>
+              <option value="Kargo Kurnia">Kargo Kurnia</option>
+            </select>
             <span class="fa fa-envelope form-control-feedback left" aria-hidden="true"></span>
           </div>
 
@@ -109,6 +124,40 @@
   </div>
 </div>
 @endif
+
+<div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="modalCartLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCartLabel">Edit Qty</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formedit" class="form-label-left input_mask" method="post">
+          @csrf
+          @method("put")
+          <input type="hidden" name="id" id="idcart">
+          <input type="text" class="form-control" name="qty" id="qtycart" placeholder="Kuantitas">
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary source" type="submit">Simpan</button>
+      </div>
+  </form> 
+    </div>
+  </div>
+</div>
 @endsection
 @push('addscript')
+<script>
+  $('.modalButtonCart').on('click', function (event) {
+            let id = $(this).data('id')
+            console.log(id)
+
+            $('#idcart').val(id)
+            $('#formedit').attr('action',"{{url('cart/')}}/"+id)
+
+          })
+</script>
 @endpush
