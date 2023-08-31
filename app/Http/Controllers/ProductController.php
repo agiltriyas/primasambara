@@ -66,10 +66,12 @@ class ProductController extends Controller
     {
         $data = $request->all();
         $data['status'] = 1;
-        $data['image'] = $request->file('image')->store(
-            'image/product',
-            'public'
-        );
+        if (isset($data['image'])) {
+            $data['image'] = $request->file('image')->store(
+                'image/product',
+                'public'
+            );
+        }
         // dd($data, $id);
         $product = Product::findOrFail($id);
         $product->update($data);

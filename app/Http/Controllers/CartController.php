@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -30,6 +31,14 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        //cek stock
+        // dd($data['stock']);
+        $product = Product::find($data['id']);
+        if ($product->qty < $data['qty']) {
+            toast('Product kuantitas melebihi jumlah stock', 'error');
+            return redirect()->route('product.index');
+        }
+
         Cart::updateOrCreate([
             'user_id' => auth()->user()->id,
             'product_id' => $data['id']

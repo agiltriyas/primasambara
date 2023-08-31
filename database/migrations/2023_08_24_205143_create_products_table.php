@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('image');
             $table->integer('price');
+            $table->integer('qty');
             $table->boolean('status')->default('1');
             $table->softDeletes();
             $table->timestamps();

@@ -20,7 +20,11 @@
                 <div class="mask no-caption">
                   <div class="tools tools-bottom">
                     <!-- <a href="#"><i class="fa fa-link"></i></a> -->
-                    <button data-id="{{$product->id}}" data-price="{{$product->price}}" class="btn text-white modalButtonCart" data-toggle="modal" data-target="#modalCart" id=""><i class="fa fa-cart-plus fa-2x " style="background-color: red;padding: 10px;border-radius: 10px;"></i></button>
+                    @if($product->qty == 0)
+                    <button class="btn text-white modalButtonCart" data-toggle="modal" data-target="#modalCart" id="" disabled><i class="fa fa-cart-plus fa-2x " style="background-color: grey;padding: 10px;border-radius: 10px;"></i></button>
+                    @else
+                    <button data-id="{{$product->id}}" data-price="{{$product->price}}" data-stock="{{$product->qty}}" class="btn text-white modalButtonCart" data-toggle="modal" data-target="#modalCart" id="" ><i class="fa fa-cart-plus fa-2x " style="background-color: red;padding: 10px;border-radius: 10px;"></i></button>
+                    @endif
                   </div>
                 </div>
               </div>
@@ -30,9 +34,12 @@
                         <p><strong>{{$product->name}}</strong>
                         </p>
                         <p>{{General::rp($product->price)}}/Kg</p>
+                        <p>Stock: {{$product->qty}}</p>
                     </div>
                     <div class="col-md-6 text-right">
-                        <button data-id="{{$product->id}}" data-name="{{$product->name}}" data-price="{{$product->price}}" class="btn btn-sm btn-info modalButton" data-toggle="modal" data-target="#modaledit" id="">Edit</button>
+                      @if(auth()->user()->role != "customer")
+                        <button data-id="{{$product->id}}" data-name="{{$product->name}}"  data-price="{{$product->price}}" data-stock="{{$product->qty}}" class="btn btn-sm btn-info modalButton" data-toggle="modal" data-target="#modaledit" id="">Edit</button>
+                        @endif
                     </div>
                 </div>
               </div>
@@ -99,6 +106,7 @@
             <input type="hidden" name="id" id="id">
             <input type="text" class="form-control" name="name" id="name" placeholder="Nama Product">
             <input type="text" class="form-control mt-2" name="price" id="price" placeholder="Harga">
+            <input type="text" class="form-control mt-2" name="qty" id="stock" placeholder="Stock">
   
             <div class="mt-2 col-md-12 col-sm-12  form-group has-feedback">
                 <label>Gambar Product</label>
@@ -127,6 +135,7 @@
             @csrf
             <input type="hidden" name="id" id="idcart">
             <input type="hidden" name="price" id="pricecart">
+            <input type="hidden" name="stock" id="stockcart">
             <input type="text" class="form-control" name="qty" id="qtycart" placeholder="Kuantitas">
         </div>
         <div class="modal-footer">
@@ -143,21 +152,26 @@
             let price = $(this).data('price')
             let name = $(this).data('name')
             let id = $(this).data('id')
+            let stock = $(this).data('stock')
+
             console.log(id)
 
             $('#id').val(id)
             $('#price').val(price)
             $('#name').val(name)
+            $('#stock').val(stock)
             $('#formedit').attr('action',"{{url('product/')}}/"+id)
 
         })
         $('.modalButtonCart').on('click', function (event) {
             let id = $(this).data('id')
             let price = $(this).data('price')
+            let stock = $(this).data('stock')
             console.log(id)
 
             $('#idcart').val(id)
             $('#pricecart').val(price)
+            $('#stockcart').val(stock)
         })
     </script>
 @endpush
