@@ -49,7 +49,7 @@
                   @if(auth()->user()->role == 'gudang' || auth()->user()->role == 'admin')
 
                   <div class="btn-group">
-                    <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
+                    <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
                   </div>
                   @endif
                   @if(auth()->user()->role != "gudang")
@@ -327,13 +327,14 @@
   $('.btnStatus').on('click', function (event) {
             let id = $(this).data('id')
             let image = $(this).data('image')
-            console.log(id)
+            let auth = $(this).data('auth')
+            console.log(image.length)
             $('#idStatus').val(id)
             $('#forstatus').attr('action',"{{url('transaction/')}}/"+id)
+            $("#statusoption .paidoption").remove()
             
-            if(image){
-                 $("#statusoption option:last").remove()
-                $("#statusoption").append('<option value="PAID">PAID</option>')
+            if(image.length != 0 && auth == "admin"){
+                $("#statusoption").append('<option class="paidoption" value="PAID">PAID</option>')
             }
         })
   $('.btnkonfirmasicust').on('click', function (event) {
