@@ -28,6 +28,7 @@
                 <th>#</th>
                 <th>User</th>
                 <th>Role</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -37,9 +38,10 @@
                 <th scope="row">{{$loop->iteration}}</th>
                 <td>{{$user->name}}</td>
                 <td>{{$user->role}}</td>
+                <td>{{($user->active == 0) ? "Tidak Aktif" : "Aktif"}}</td>
                 <td>
                   <div class="btn-group">
-                    <button class="btn btn-sm btn-primary btnupdatestatus" data-id="{{$user->id}}" data-toggle="modal" data-target="#modalStatus">Edit</button>
+                    <button class="btn btn-sm btn-primary btnupdatestatus" data-id="{{$user->id}}" data-role="{{$user->role}}" data-active="{{$user->active}}" data-toggle="modal" data-target="#modalStatus">Edit</button>
                   </div>
                 </td>
               </tr>
@@ -71,12 +73,16 @@
           <input type="email" class="form-control mb-3" name="email" id="" placeholder="Email Address">
           <select name="role" id="role" class="form-control mb-3">
             <option value="0">--Select Role--</option>
-            <<option value="admin">ADMIN</option>
+            <option value="admin">ADMIN</option>
             <option value="customer">CUSTOMER</option>
             <option value="gudang">GUDANG</option>
           </select>
           <input type="password" class="form-control mb-3" name="password" id="" placeholder="Password">
           <input type="password" class="form-control mb-3" name="password_confirmation" id="" placeholder="Password Confirmation">
+            <select class="form-control" name="active" id="">
+              <option value="0">Tidak Aktif</option>
+              <option value="1">Aktif</option>
+            </select>
 
       </div>
       <div class="modal-footer">
@@ -103,11 +109,17 @@
           @method('PUT')
           <input type="hidden" name="id" id="idStatus">
           <div class="col-md-12 col-sm-12  form-group has-feedback">
-            <select class="form-control" name="status" id="">
+            <select class="form-control" name="status" id="roleselect">
               <option value="0">--Pilih Role--</option>
               <option value="admin">ADMIN</option>
               <option value="customer">CUSTOMER</option>
               <option value="gudang">GUDANG</option>
+            </select>
+          </div>
+          <div class="col-md-12 col-sm-12  form-group has-feedback">
+            <select class="form-control" name="active" id="activeselect">
+              <option value="0">Tidak Aktif</option>
+              <option value="1">Aktif</option>
             </select>
           </div>
         </div>
@@ -126,7 +138,12 @@
   $(".btnupdatestatus").on('click', function () {
             
     let id = $(this).data('id')
+    let active = $(this).data('active')
+    let role = $(this).data('role')
+
     $('#idStatus').val(id)
+    $('#roleselect').val(role).change();
+    $('#activeselect').val(active).change();
     $('#formstatus').attr('action',"{{url('user/')}}/"+id)
   })
 </script>

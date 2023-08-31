@@ -38,6 +38,7 @@ class UserController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => $data['role'],
+            'active' => $data['active'],
         ]);
 
         toast('User berhasil dibuat', 'success');
@@ -66,7 +67,8 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         $user = User::find($id);
-        $user->update(['role' => $request->status]);
+        // dd($request->all());
+        $user->update(['role' => $request->status, 'active' => $request->active]);
 
         toast('User berhasil diupdate', 'success');
         return redirect()->back();
