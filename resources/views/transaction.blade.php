@@ -26,8 +26,11 @@
               <tr>
                 <th>#</th>
                 <th>Date</th>
-                <th>No. Transction</th>
                 <th>Nama Customer</th>
+                <th>No. Transction</th>
+                <th>No. Invoice</th>
+                <th>No. SJ</th>
+                <th>Pembayaran</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -37,8 +40,11 @@
               <tr>
                 <th scope="row">{{$loop->iteration}}</th>
                 <td>{{$transaction->created_at}}</td>
-                <td>{{$transaction->noinv}}</td>
                 <td>{{$transaction->namapenerima}}</td>
+                <td>{{$transaction->notrans}}</td>
+                <td>{{$transaction->noinv}}</td>
+                <td>{{$transaction->nosj}}</td>
+                <td>{{$transaction->bank}}</td>
                 <td>{{$transaction->status}}</td>
                 <td>
                   
