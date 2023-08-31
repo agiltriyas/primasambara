@@ -45,7 +45,7 @@ class TransactionController extends Controller
                 'user_id' => auth()->user()->id,
                 'ekspedisi' => $data['ekspedisi'],
                 'nohp' => $data['nohp'],
-                'noinv' => "INV" . time(),
+                'notrans' => "TRS" . time(),
                 'namapenerima' => $data['namapenerima'],
                 'address' => $data['address']
             ])->id;
@@ -57,6 +57,12 @@ class TransactionController extends Controller
                     'qty' => $cart->qty,
                     'price' => $cart->product->price,
                 ]);
+
+
+                //kurangin stock
+                $product = Product::find($cart->product_id);
+                $qty = $product->qty - $cart->qty;
+                $product->update(['qty' => $qty]);
             }
         });
         Cart::where('user_id', auth()->user()->id)->delete();
@@ -89,7 +95,8 @@ class TransactionController extends Controller
     {
         // dd($request->all());
         $data = $request->all();
-        $transaction = Transaction::find($id);
+
+        $transaction = Transaction::with('detailTransaction')->find($id);
         if ($request->type == "image") {
             $data['image'] = $request->file('image')->store(
                 'image/buktibayar',
@@ -97,7 +104,22 @@ class TransactionController extends Controller
             );
             $transaction->update(['image' => $data['image'], 'bank' => $data['bank']]);
         } else {
-            $transaction->update(['status' => $request->status]);
+            if ($data['status'] == "SJ") {
+                $transaction->update(['status' => $request->status, 'nosj' => "SJ" . time()]);
+            } elseif ($data['status'] == "INV") {
+                $transaction->update(['status' => $request->status, 'noinv' => "INV" . time()]);
+            } elseif ($data['status'] == "WIP") {
+                $transaction->update(['status' => $request->status, 'nospk' => $transaction->notrans]);
+            } elseif ($data['status'] == "REJECT") {
+                foreach ($transaction->detailTransaction as $detail) {
+                    //tambahin stock
+                    $product = Product::find($detail->product_id);
+                    $qty = $product->qty + $detail->qty;
+                    $product->update(['qty' => $qty]);
+                }
+            } else {
+                $transaction->update(['status' => $request->status]);
+            }
         }
 
         toast('Transaction berhasil diupdate', 'success');

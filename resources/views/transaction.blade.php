@@ -27,7 +27,7 @@
                 <th>#</th>
                 <th>Date</th>
                 <th>Nama Customer</th>
-                <th>No. Transction</th>
+                <th>No. Transaction</th>
                 <th>No. Invoice</th>
                 <th>No. SJ</th>
                 <th>Pembayaran</th>
@@ -42,9 +42,9 @@
                 <td>{{$transaction->created_at}}</td>
                 <td>{{$transaction->namapenerima}}</td>
                 <td>{{$transaction->notrans}}</td>
-                <td>{{$transaction->noinv}}</td>
-                <td>{{$transaction->nosj}}</td>
-                <td>{{$transaction->bank}}</td>
+                <td>{{($transaction->noinv)?:"-"}}</td>
+                <td>{{($transaction->nosj) ?:"-"}}</td>
+                <td>{{($transaction->bank)?:"-"}}</td>
                 <td>{{$transaction->status}}</td>
                 <td>
                   
@@ -52,8 +52,14 @@
                     <a class="btn btn-sm btn-info btnView" data-id="{{$transaction->id}}" href="#" data-toggle="modal" data-target="#modalView">View</a>
                   </div>
                   
-                  @if(auth()->user()->role == 'gudang' || auth()->user()->role == 'admin')
-
+                  @if(auth()->user()->role == 'gudang')
+                  @if($transaction->status == "APPROVE")
+                  <div class="btn-group">
+                    <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
+                  </div>
+                  @endif
+                  @endif
+                  @if(auth()->user()->role == 'admin')
                   <div class="btn-group">
                     <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
                   </div>
