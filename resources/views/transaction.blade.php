@@ -52,14 +52,14 @@
                     <a class="btn btn-sm btn-info btnView" data-id="{{$transaction->id}}" href="#" data-toggle="modal" data-target="#modalView">View</a>
                   </div>
                   
-                  @if(auth()->user()->role == 'gudang')
-                  @if($transaction->status == "APPROVE")
-                  <div class="btn-group">
-                    <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
-                  </div>
-                  @endif
-                  @endif
-                  @if(auth()->user()->role == 'admin')
+                  <!--@if(auth()->user()->role == 'gudang')-->
+                  <!--@if($transaction->status == "APPROVE")-->
+                  <!--<div class="btn-group">-->
+                  <!--  <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>-->
+                  <!--</div>-->
+                  <!--@endif-->
+                  <!--@endif-->
+                  @if(auth()->user()->role != 'customer')
                   <div class="btn-group">
                     <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
                   </div>
@@ -221,10 +221,10 @@
             <select class="form-control" name="status" id="statusoption">
               <option value="">--Pilih Status--</option>
               @if(auth()->user()->role == "admin")
-              <option value="APPROVE">APPROVE</option>
               <option value="REJECT">REJECT</option>
               <option value="INV">INV</option>
               @endif
+              <option value="APPROVE">APPROVE</option>
               <option value="WIP">WIP</option>
               <option value="SJ">SJ</option>
             </select>

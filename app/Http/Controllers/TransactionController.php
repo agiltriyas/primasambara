@@ -16,7 +16,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        if (auth()->user()->role == "admin") {
+        if (auth()->user()->role != "customer") {
             $transactions = Transaction::all();
         } else {
             $transactions = Transaction::where('user_id', auth()->user()->id)->get();
@@ -98,11 +98,14 @@ class TransactionController extends Controller
 
         $transaction = Transaction::with('detailTransaction')->find($id);
         if ($request->type == "image") {
-            $data['image'] = $request->file('image')->store(
-                'image/buktibayar',
-                'public'
-            );
-            $transaction->update(['image' => $data['image'], 'bank' => $data['bank']]);
+            if(isset($data['image'])){
+                $data['image'] = $request->file('image')->store(
+                    'image/buktibayar',
+                    'public'
+                );
+                $transaction->update(['image' => $data['image']]);
+            }
+            $transaction->update(['bank' => $data['bank']]);
         } else {
             if ($data['status'] == "SJ") {
                 $transaction->update(['status' => $request->status, 'nosj' => "SJ" . time()]);
