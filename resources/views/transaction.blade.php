@@ -52,14 +52,14 @@
                     <a class="btn btn-sm btn-info btnView" data-id="{{$transaction->id}}" href="#" data-toggle="modal" data-target="#modalView">View</a>
                   </div>
                   
-                  <!--@if(auth()->user()->role == 'gudang')-->
-                  <!--@if($transaction->status == "APPROVE")-->
-                  <!--<div class="btn-group">-->
-                  <!--  <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>-->
-                  <!--</div>-->
-                  <!--@endif-->
-                  <!--@endif-->
-                  @if(auth()->user()->role != 'customer')
+                  @if(auth()->user()->role == 'gudang')
+                  @if($transaction->status == "APPROVE" || $transaction->status == "PAID")
+                  <div class="btn-group">
+                  <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
+                  </div>
+                  @endif
+                  @endif
+                  @if(auth()->user()->role == 'admin')
                   <div class="btn-group">
                     <a class="btn btn-sm btn-primary btnStatus" data-image="{{$transaction->image}}" data-id="{{$transaction->id}}" data-auth="{{auth()->user()->role}}" href="#" data-toggle="modal" data-target="#modalStatus">Status</a>
                   </div>
@@ -67,11 +67,11 @@
                   @if(auth()->user()->role != "gudang")
                   <div class="btn-group">
                     @if(auth()->user()->role == "admin")
-                    @if($transaction->image)
-                    <a class="btn btn-sm btn-primary btnkonfirmasi" href="#" data-image="{{$transaction->image}}" data-bank="{{$transaction->bank}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasi">Konfirmasi</a>
+                    @if($transaction->image || $transaction->imagedp)
+                    <a class="btn btn-sm btn-primary btnkonfirmasi" href="#" data-image="{{$transaction->image}}" data-imagedp="{{$transaction->imagedp}}" data-bank="{{$transaction->bank}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasi">Konfirmasi</a>
                     @endif
                     @else
-                    <a class="btn btn-sm btn-primary btnkonfirmasicust" href="#" data-image="{{$transaction->image}}" data-bank="{{$transaction->bank}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasicust">Konfirmasi</a>
+                    <a class="btn btn-sm btn-primary btnkonfirmasicust" href="#" data-image="{{$transaction->image}}" data-imagedp="{{$transaction->imagedp}}" data-bank="{{$transaction->bank}}" data-id="{{$transaction->id}}" data-toggle="modal" data-target="#modalKonfirmasicust">Konfirmasi {{(strlen($transaction->imagedp == 0)) ? "DP" : ""}}</a>
                     @endif  
                   </div>
                   @endif
@@ -86,7 +86,7 @@
                         <a class="dropdown-item" href="{{route('sj',$transaction->id)}}">SURAT JALAN</a>
                       @endif
                       
-                    @if($transaction->status == "INV")
+                    @if($transaction->status == "INV" || $transaction->status == "PENDING")
                       @if(auth()->user()->role == 'admin' || auth()->user()->role == 'customer')
                         <a class="dropdown-item" href="{{route('inv',$transaction->id)}}">INVOICE</a>
                       @endif
@@ -221,10 +221,10 @@
             <select class="form-control" name="status" id="statusoption">
               <option value="">--Pilih Status--</option>
               @if(auth()->user()->role == "admin")
+              <option value="APPROVE">APPROVE</option>
               <option value="REJECT">REJECT</option>
               <option value="INV">INV</option>
               @endif
-              <option value="APPROVE">APPROVE</option>
               <option value="WIP">WIP</option>
               <option value="SJ">SJ</option>
             </select>
@@ -257,7 +257,13 @@
               <p id="bankp"> </p>
               <label>Foto bukti pembayaran</label>
               </br>
-              <img class="mt-3" id="imagekonfirmasi" src="" width=200 alt="Belum tersedia">
+              <div class="col-md-6">
+                <img class="mt-3" id="imagekonfirmasidp" src="" width=200 alt="Belum tersedia">
+                DP
+              </div>
+              <div class="col-md-6">
+                <img class="mt-3" id="imagekonfirmasi" src="" width=200 alt="Belum tersedia">
+              </div>
           </div>
         </form> 
       {{-- <h5 class="mt-4">Instruksi Pembayaran</h5>
@@ -294,13 +300,22 @@
           <div class="col-md-12 col-sm-12  form-group has-feedback">
               <label>Foto bukti pembayaran</label>
                 <input type="file" name="image" class="form-control">
-              <img class="mt-3" id="imagekonfirmasicust" src="" width=200>
-              <select name="bank" id="bankselect" class="form-control mt-3">
-                <option value="bca">BCA</option>
-                <option value="panin">PANIN</option>
-              </select>
+                <select name="bank" id="bankselect" class="form-control mt-3">
+                  <option value="bca">BCA</option>
+                  <option value="panin">PANIN</option>
+                </select>
+                <div class="col-md-6">
+                  <img class="mt-3" id="imagekonfirmasicustdp" src="" width=200>
+                  DP
+                </div>
+                <div class="col-md-6">
+                  <img class="mt-3" id="imagekonfirmasicust" src="" width=200>
+                </div>
           </div>
           <h5 class="mt-4">Informasi Pembayaran</h5>
+          Pembayaran 50% DP dan 50% sebelum pengiriman
+        </br>
+      </br>
           Pembayaran dapat dilakukan melalui rekening
           <ul class="bankul">
               <li>Bank BCA - No Rekening : 109210912 - a.n. PT PRIMA SAMBARA PERSADA</li>
@@ -363,14 +378,18 @@
         })
   $('.btnkonfirmasicust').on('click', function (event) {
       $('#imagekonfirmasicust').removeAttr('src')
+      $('#imagekonfirmasicustdp').removeAttr('src')
+
       let id = $(this).data('id')
       let image = $(this).data('image')
+      let imagedp = $(this).data('imagedp')
       let bank = $(this).data('bank')
-console.log(bank)
       $('#idStatus').val(id)
       // $(`#bankselect option[value=${bank}]`).change();
       $(`#bankselect`).val(bank).change();
 
+      if(imagedp)
+        $('#imagekonfirmasicustdp').attr('src',"{{url('storage')}}/"+imagedp)
 
       if(image)
         $('#imagekonfirmasicust').attr('src',"{{url('storage')}}/"+image)
@@ -379,8 +398,10 @@ console.log(bank)
   })
   $('.btnkonfirmasi').on('click', function (event) {
       $('#imagekonfirmasi').removeAttr('src')
+      $('#imagekonfirmasidp').removeAttr('src')
       let id = $(this).data('id')
       let image = $(this).data('image')
+      let imagedp = $(this).data('imagedp')
       let bank = $(this).data('bank')
 
       $('#idStatus').val(id)
@@ -391,6 +412,9 @@ console.log(bank)
       // }
       if(image)
         $('#imagekonfirmasi').attr('src',"{{url('storage')}}/"+image)
+
+      if(imagedp)
+        $('#imagekonfirmasidp').attr('src',"{{url('storage')}}/"+imagedp)
   })
 </script>
 @endpush

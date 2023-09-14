@@ -98,12 +98,20 @@ class TransactionController extends Controller
 
         $transaction = Transaction::with('detailTransaction')->find($id);
         if ($request->type == "image") {
-            if(isset($data['image'])){
-                $data['image'] = $request->file('image')->store(
-                    'image/buktibayar',
-                    'public'
-                );
-                $transaction->update(['image' => $data['image']]);
+            if (isset($data['image'])) {
+                if (strlen($transaction->imagedp) > 0) {
+                    $data['image'] = $request->file('image')->store(
+                        'image/buktibayar',
+                        'public'
+                    );
+                    $transaction->update(['image' => $data['image']]);
+                } else {
+                    $data['image'] = $request->file('image')->store(
+                        'image/buktibayar',
+                        'public'
+                    );
+                    $transaction->update(['imagedp' => $data['image']]);
+                }
             }
             $transaction->update(['bank' => $data['bank']]);
         } else {

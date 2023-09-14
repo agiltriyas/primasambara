@@ -94,6 +94,9 @@
                     <?php $total = $total + ($detail->qty * $detail->product->price) ?>
 
                     @endforeach
+
+                    <?php $dp = $total*0.5 ?>
+                    <?php $grandtotal = $total-$dp ?>
                   </tbody>
                 </table>
               </div>
@@ -124,8 +127,12 @@
                         <td>{{General::rp($total)}}</td>
                       </tr>
                       <tr>
+                        <th style="width:50%">DP 50%:</th>
+                        <td>- {{General::rp($dp)}}</td>
+                      </tr>
+                      <tr>
                         <th>Total:</th>
-                        <td>{{General::rp($total)}}</td>
+                        <td>{{General::rp($grandtotal)}}</td>
                       </tr>
                     </tbody>
                   </table>
